@@ -55,7 +55,7 @@ class MobileAuthPage extends StatelessWidget {
                               return null;
                             },
                             decoration: InputDecoration(
-                                prefix: Text("+91"),
+                                prefix: Text("+91 "),
                                 hintText: "Enter Phone Number",
                                 border: OutlineInputBorder()),
                           ),
@@ -74,6 +74,8 @@ class MobileAuthPage extends StatelessWidget {
                         fixedSize: WidgetStatePropertyAll(Size.fromWidth(300))),
                     onPressed: () {
                       if (formKey.currentState!.validate()) {
+                        String maskedPhone =
+                            "*******${phoneCtrl.text.substring(8)}";
                         provider.sentOtp(
                             phone: phoneCtrl.text,
                             errorStep: () => ScaffoldMessenger.of(context)
@@ -82,7 +84,11 @@ class MobileAuthPage extends StatelessWidget {
                                   "Error in sending otp ",
                                 ))),
                             nextStep: () {
-                              Get.to(() => OtpPage(),
+                              Get.off(
+                                  () => OtpPage(
+                                        maskphonenbr: maskedPhone,
+                                        phonenbr: phoneCtrl.text,
+                                      ),
                                   transition: Transition.downToUp);
                             });
                       }

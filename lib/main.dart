@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:totalx/controller/mobile_auth.dart';
 import 'package:totalx/firebase_options.dart';
+import 'package:totalx/view/home_page.dart';
 import 'package:totalx/view/mobile_auth_page.dart';
 
 Future<void> main() async {
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
       ],
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
-        home: MobileAuthPage(),
+        home: HomePage(),
       ),
     );
   }
