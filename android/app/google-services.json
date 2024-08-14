@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "78282127166",
+    "project_id": "totalx-a3a4d",
+    "storage_bucket": "totalx-a3a4d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:78282127166:android:34d5f3a46c7891429f5e6f",
+        "android_client_info": {
+          "package_name": "com.example.tota"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjFP5yONvHWb3tiW4i7IrbAu1NXCRPrwk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:78282127166:android:188d17a94c9da2f19f5e6f",
+        "android_client_info": {
+          "package_name": "com.example.totalx"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjFP5yONvHWb3tiW4i7IrbAu1NXCRPrwk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
