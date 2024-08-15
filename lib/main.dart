@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:totalx/controller/mobile_auth.dart';
-import 'package:totalx/firebase_options.dart';
+import 'package:totalx/controller/service_controller.dart';
+import 'package:totalx/service/firebase_options.dart';
 import 'package:totalx/view/home_page.dart';
-import 'package:totalx/view/mobile_auth_page.dart';
+import 'package:totalx/view/widget/auth_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +25,10 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (context) => PhoneOtpAuth(),
-        )
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ServiceController(),
+        ),
       ],
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,

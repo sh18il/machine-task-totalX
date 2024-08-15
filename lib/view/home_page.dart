@@ -1,37 +1,42 @@
-import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
+import 'package:totalx/controller/service_controller.dart';
 import 'package:totalx/model/user_model.dart';
-import 'package:totalx/service/add_service.dart';
+import 'package:totalx/view/widget/home_widget.dart';
 
-class HomePage extends StatefulWidget {
-  HomePage({super.key});
-
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  final TextEditingController nameCtrl = TextEditingController();
-  final TextEditingController ageCtrl = TextEditingController();
-  final TextEditingController phoneCtrl = TextEditingController();
-  String searchQuery = '';
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    AddService service = AddService();
-
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          title: const Row(
+            children: [
+              Icon(
+                Icons.location_on,
+                color: Colors.white,
+              ),
+              Gap(5),
+              Text(
+                "Nilambur",
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ],
+          ),
+        ),
         backgroundColor: const Color.fromARGB(255, 177, 177, 177),
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.black,
           onPressed: () {
-            AddBoxDialog(context);
+            addBoxDialog(context);
           },
-          child: Icon(
+          child: const Icon(
             Icons.add,
             color: Colors.white,
           ),
@@ -39,96 +44,130 @@ class _HomePageState extends State<HomePage> {
         body: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(10),
               child: Row(
                 children: [
                   Expanded(
-                    child: TextField(
-                      cursorRadius: Radius.circular(20),
-                      onChanged: (value) {
-                        setState(() {
-                          searchQuery =
-                              value.toLowerCase(); // Update search query
-                        });
+                    child: Consumer<ServiceController>(
+                      builder: (context, provider, _) {
+                        return TextField(
+                          cursorRadius: const Radius.circular(20),
+                          onChanged: (value) {
+                            provider.searchStatus(value);
+                          },
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 16.0),
+                            prefixIcon: const Icon(Icons.search),
+                            hintText: "Search by Name",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                        );
                       },
-                      decoration: InputDecoration(
-                        hintText: "Search...",
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30)),
+                    ),
+                  ),
+                  const Gap(5),
+                  InkWell(
+                    onTap: () {
+                      filtterBoxSeet(context);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      width: 40,
+                      height: 40,
+                      child: const Icon(
+                        Icons.filter_list,
+                        color: Colors.white,
                       ),
                     ),
                   ),
-                  IconButton(onPressed: () {}, icon: Icon(Icons.filter_list))
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
               child: Row(
                 children: [
                   Text(
-                    "Users List",
+                    "Users Lists",
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
             Flexible(
-              child: StreamBuilder<QuerySnapshot<UserModel>>(
-                stream: service.getData(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text("Error: ${snapshot.error}"),
-                    );
-                  } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return Center(
-                      child: Text("No users found."),
-                    );
-                  } else {
-                    List<QueryDocumentSnapshot<UserModel>> userDatas =
-                        snapshot.data!.docs;
-
-                    // Filter the data based on search query
-                    List<QueryDocumentSnapshot<UserModel>> filteredUserDatas =
-                        userDatas
-                            .where((user) => user
-                                .data()
-                                .name!
-                                .toLowerCase()
-                                .contains(searchQuery))
-                            .toList();
-
-                    return ListView.builder(
-                      itemCount: filteredUserDatas.length,
-                      itemBuilder: (context, index) {
-                        final data = filteredUserDatas[index].data();
-
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ListTile(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            visualDensity: VisualDensity(
-                              vertical: BorderSide.strokeAlignInside,
-                            ),
-                            tileColor: Colors.white,
-                            leading: CircleAvatar(
-                              maxRadius: 30,
-                              child: Icon(Icons.person),
-                            ),
-                            title: Text(data.name.toString()),
-                            subtitle: Text('Age: ${data.age},'),
-                          ),
+              child: Consumer<ServiceController>(
+                builder: (context, provider, _) {
+                  return StreamBuilder<QuerySnapshot<UserModel>>(
+                    stream: provider.getUser(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: Lottie.asset(
+                              "assets/lottie/Animation - 1707804128790.json"),
                         );
-                      },
-                    );
-                  }
+                      } else if (snapshot.hasError) {
+                        return Center(
+                          child: Text("Error: ${snapshot.error}"),
+                        );
+                      } else if (!snapshot.hasData) {
+                        return Center(
+                          child: Lottie.asset(
+                              "assets/lottie/Animation - 1707804128790.json"),
+                        );
+                      } else {
+                        List<QueryDocumentSnapshot<UserModel>> userDatas =
+                            snapshot.data!.docs;
+                        List<QueryDocumentSnapshot<UserModel>>
+                            filteredUserDatas =
+                            provider.applyFilters(userDatas);
+                        if (filteredUserDatas.isEmpty) {
+                          return Center(
+                            child: Lottie.asset(
+                                "assets/lottie/Animation - 1723132358628 (1).json"),
+                          );
+                        }
+
+                        return ListView.builder(
+                          itemCount: filteredUserDatas.length,
+                          itemBuilder: (context, index) {
+                            final data = filteredUserDatas[index].data();
+
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ListTile(
+                                minTileHeight: 86,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                tileColor: Colors.white,
+                                leading: CircleAvatar(
+                                  maxRadius: 60,
+                                  backgroundImage: data.image != null
+                                      ? NetworkImage(
+                                          data.image.toString(),
+                                        )
+                                      : const AssetImage(
+                                              "assets/images/images.png")
+                                          as ImageProvider,
+                                  child: data.image == null
+                                      ? const Icon(Icons.person)
+                                      : null,
+                                ),
+                                title: Text(data.name ?? ''),
+                                subtitle: Text('Age: ${data.age}'),
+                              ),
+                            );
+                          },
+                        );
+                      }
+                    },
+                  );
                 },
               ),
             ),
@@ -136,119 +175,5 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-  }
-
-  Future<dynamic> AddBoxDialog(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          contentPadding: EdgeInsets.all(16.0),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircleAvatar(
-                  maxRadius: 40,
-                  child: Icon(Icons.person, size: 40),
-                ),
-                Gap(16),
-                TextFormField(
-                  controller: nameCtrl,
-                  decoration: InputDecoration(
-                    label: Text("Name"),
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Name cannot be empty';
-                    }
-                    return null;
-                  },
-                ),
-                Gap(16),
-                TextFormField(
-                  controller: ageCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    label: Text("Age"),
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || int.tryParse(value) == null) {
-                      return 'Please enter a valid age';
-                    }
-                    return null;
-                  },
-                ),
-                Gap(16),
-                TextFormField(
-                  controller: phoneCtrl,
-                  keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
-                    label: Text("Phone"),
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.length != 10) {
-                      return 'Please enter a valid phone number';
-                    }
-                    return null;
-                  },
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                clearControllers();
-              },
-              child: Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                if (nameCtrl.text.isNotEmpty &&
-                    ageCtrl.text.isNotEmpty &&
-                    phoneCtrl.text.isNotEmpty) {
-                  addData(context);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Please fill all fields')),
-                  );
-                }
-              },
-              child: Text("Save"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  addData(BuildContext context) async {
-    AddService service = AddService();
-    final datas = UserModel(
-      name: nameCtrl.text,
-      age: int.tryParse(ageCtrl.text),
-      phone: phoneCtrl.text,
-      image: "",
-    );
-
-    await service.addData(datas);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('User added successfully')),
-    );
-
-    Navigator.of(context).pop();
-    clearControllers();
-  }
-
-  void clearControllers() {
-    nameCtrl.clear();
-    ageCtrl.clear();
-    phoneCtrl.clear();
   }
 }

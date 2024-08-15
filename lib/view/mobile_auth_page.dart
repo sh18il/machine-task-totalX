@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:provider/provider.dart';
 import 'package:totalx/controller/mobile_auth.dart';
 import 'package:totalx/view/otp_page.dart';
-import 'package:totalx/view/widget/auth_page.dart';
 
 class MobileAuthPage extends StatelessWidget {
   MobileAuthPage({super.key});
