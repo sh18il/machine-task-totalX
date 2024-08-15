@@ -30,9 +30,9 @@ class MyApp extends StatelessWidget {
           create: (context) => ServiceController(),
         ),
       ],
-      child: GetMaterialApp(
+      child: const GetMaterialApp(
         debugShowCheckedModeBanner: false,
-        home: HomePage(),
+        home: AuthPage(),
       ),
     );
   }
